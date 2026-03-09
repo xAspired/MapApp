@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Richi Map</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+
+    <!-- Icons & Carousel -->
+    <link rel="stylesheet" href="fonts/icomoon/style.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  </head>
+  <body>
+    <!-- Navbar -->
+    <header class="site-navbar" role="banner">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-11 col-xl-2">
+            <h1 class="mb-0 site-logo"><a href="index.html" class="text-white mb-0">Richi</a></h1>
+          </div>
+          <div class="col-12 col-md-10 d-none d-xl-block">
+            <nav class="site-navigation position-relative text-right" role="navigation">
+              <ul class="site-menu js-clone-nav mr-auto d-none d-lg-block">
+                <li class="active"><a href="index.html"><span>Map</span></a></li>
+                <li><a href="about.html"><span>List</span></a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- SEARCH BAR -->
+    <div class="map-search">
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="Cerca luogo, indirizzo, bar, campo..."
+        autocomplete="off"
+      />
+      <div id="search-results" class="search-results"></div>
+    </div>
+
+    <!-- Map -->
+    <div id="map" style="height: 90vh;"></div>
+
+    <!-- Floating Action Button -->
+    <div class="map-fab">
+      <button id="fab-toggle" class="fab-btn">+</button>
+      <div id="fab-menu" class="fab-menu hidden">
+
+        <button data-action="locate">📍 La mia posizione</button>
+        <button data-action="add-marker">➕ Aggiungi marker</button>
+        <button data-action="create-folder">📁 Crea cartella</button>
+        <button data-action="reset">🗺️ Reset mappa</button>
+        <button id="toggle-countries">🌍 Mostra solo paesi con pin</button>
+      
+        <!-- PANEL CARTELLE -->
+        <div id="folders-panel"></div>
+      
+      </div>
+    </div>
+
+    <!-- MODAL CREAZIONE CARTELLA -->
+    <div id="folder-modal" class="modal-overlay">
+      <div class="modal">
+        <h5>Crea Cartella</h5>
+        <input type="text" id="folder-name-input" placeholder="Nome cartella">
+        <input type="color" id="folder-color-input" value="#ff0000">
+        <button id="folder-save-btn">💾 Salva</button>
+        <button id="folder-cancel-btn">❌ Annulla</button>
+      </div>
+    </div>
+
+    <!-- MODAL CREAZIONE MARKER -->
+    <div id="marker-modal" class="modal-overlay">
+      <div class="modal">
+        <h5>Aggiungi Marker</h5>
+        <input type="text" id="marker-name-input" placeholder="Nome luogo">
+        <input type="text" id="marker-desc-input" placeholder="Descrizione (opzionale)">
+        <select id="marker-folder-select">
+          <option value="">Nessuna cartella</option>
+          ${folders.map(f => `<option value="${f.id}">${f.name}</option>`).join('')}
+        </select>
+        <button id="marker-save-btn">💾 Salva Marker</button>
+        <button id="marker-cancel-btn">❌ Annulla</button>
+      </div>
+    </div>
+
+    <!-- JS -->
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/jquery.sticky.js"></script>
+    <script type="module" src="map/map.js"></script>
+  </body>
+</html>

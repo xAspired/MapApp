@@ -1,0 +1,52 @@
+{
+  "name": "mapapp",
+  "version": "1.0.0",
+  "description": "Map application",
+  "author": "Gianmattia",
+  "main": "electron/main.js",
+  "type": "commonjs",
+  "license": "ISC",
+  "scripts": {
+    "start": "electron .",
+    "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "build": "electron-builder --mac --win --publish never",
+    "dist": "electron-builder --win --x64 --ia32 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^25.3.1",
+    "electron-builder": "^26.8.1",
+    "electron-rebuild": "^3.2.9"
+  },
+  "dependencies": {
+    "@turf/boolean-point-in-polygon": "^7.3.4",
+    "better-sqlite3": "^12.6.2"
+  },
+  "build": {
+    "appId": "com.mapapp.desktop",
+    "productName": "MapApp",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "backend/**/*",
+      "frontend/**/*",
+      "electron/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": "nsis",
+      "artifactName": "MapAppSetup-${version}.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

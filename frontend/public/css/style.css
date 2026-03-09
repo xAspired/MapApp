@@ -1,0 +1,348 @@
+/* ===============================
+   BASE
+   =============================== */
+
+   body {
+    font-family: "Open Sans", -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #fff;
+    position: relative;
+  }
+  
+  /* Testo base */
+  p {
+    color: #b3b3b3;
+    font-weight: 300;
+  }
+  
+  /* Titoli */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+  }
+  
+  /* Link */
+  a {
+    transition: 0.3s all ease;
+    text-decoration: none !important;
+  }
+  
+  /* ===============================
+     NAVBAR
+     =============================== */
+  
+  .site-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    z-index: 2000;
+    background-color: black;
+  }
+  
+  /* Logo */
+  .site-navbar .site-logo {
+    font-size: 24px;
+  }
+  
+  /* Menu principale */
+  .site-navbar .site-menu {
+    margin: 0;
+  }
+  
+  /* Voci menu */
+  .site-navbar .site-menu > li {
+    display: inline-block;
+    padding: 30px 0;
+  }
+  
+  .site-navbar .site-menu > li > a {
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 0;
+  }
+  
+  .site-navbar .site-menu > li > a > span {
+    padding: 5px 20px;
+    border-radius: 30px;
+    transition: 0.3s ease;
+  }
+  
+  /* Hover menu */
+  .site-navbar .site-menu > li > a:hover > span,
+  .site-navbar .site-menu .active > a span {
+    background: #007bff;
+    color: #fff;
+  }
+  
+  /* ===============================
+     MOBILE MENU (OFFCANVAS)
+     =============================== */
+  
+  .site-mobile-menu {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 300px;
+    height: 100vh;
+    background: #fff;
+    transform: translateX(100%);
+    transition: 0.3s ease;
+    z-index: 2000;
+  }
+  
+  .offcanvas-menu .site-mobile-menu {
+    transform: translateX(0);
+  }
+  
+  .site-mobile-menu-header {
+    padding: 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .site-mobile-menu-close span {
+    font-size: 30px;
+    cursor: pointer;
+  }
+  
+  .site-mobile-menu-body {
+    padding: 20px;
+    overflow-y: auto;
+  }
+  
+  /* ===============================
+     GLOBAL
+     =============================== */
+  
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  /* ===============================
+     MAPPA LEAFLET
+     =============================== */
+  
+  #map {
+    position: fixed;
+    top: 90px;   /* lascia spazio alla navbar */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;  /* basso, così FAB rimane sopra */
+  }
+  
+  .leaflet-pane {
+    z-index: 1 !important;
+  }
+  
+  /* ===============================
+     MAP FLOATING ACTION BUTTON
+     =============================== */
+  .map-fab {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 100000; /* sopra tutto */
+  }
+  
+  .fab-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: #007bff;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  }
+  
+  .fab-menu {
+    position: absolute;
+    bottom: 70px;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100000;
+  }
+  
+  .fab-menu button {
+    background: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    text-align: left;
+    white-space: nowrap;
+  }
+  
+  .fab-menu.hidden { display: none; }
+  
+  /* ===============================
+     FOLDERS PANEL
+     =============================== */
+  
+  #folders-panel {
+    margin-top: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 10px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+  }
+  
+  .folder-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    background: white;
+    padding: 6px;
+    border-radius: 6px;
+  }
+  
+  .folder-row input[type="text"] {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 13px;
+  }
+  
+  .folder-row button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #dc3545;
+  }
+  
+  /* selezione cartella (se la riuserai) */
+  .folder-row.selectable-folder {
+    border: 2px dashed #007bff;
+    cursor: pointer;
+  }
+  
+  .folder-row.selectable-folder:hover {
+    background: rgba(0, 123, 255, 0.1);
+  }
+  
+  /* ===============================
+     CUSTOM POPUP
+     =============================== */
+  
+  .custom-popup .leaflet-popup-content-wrapper {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+  
+  .custom-popup .leaflet-popup-tip {
+    display: none;
+  }
+  
+  /* ===============================
+    SEARCH BAR
+    =============================== */
+  
+  .map-search {
+    position: fixed;
+    top: 100px; /* sotto navbar */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    z-index: 1500;
+  }
+  
+  #search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 30px;
+    border: none;
+    outline: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    font-size: 14px;
+  }
+  
+  .search-results {
+    margin-top: 8px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+  }
+  
+  .search-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .search-item:hover {
+    background: #f5f7ff;
+  }
+  
+  .search-item:last-child {
+    border-bottom: none;
+  }
+  
+  /* ===============================
+     MODALI CREAZIONE CARTELLA E MARKER
+     =============================== */
+  
+     .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000000;
+      visibility: hidden; /* nascosto di default */
+      opacity: 0;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .modal-overlay.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .modal {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .modal input, .modal select {
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    
+    .modal button {
+      padding: 10px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
+    .modal button:hover {
+      background: #0056b3;
+    }
