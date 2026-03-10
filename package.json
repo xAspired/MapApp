@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@turf/boolean-point-in-polygon": "^7.3.4",
-    "better-sqlite3": "^12.6.2"
+    "better-sqlite3": "^9.4.0"
   },
   "build": {
     "appId": "com.mapapp.desktop",
