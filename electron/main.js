@@ -1,11 +1,38 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const { pathToFileURL } = require("url");
+const http = require("http");
 
-async function createWindow() {
+// Funzione per verificare se il server è pronto
+function waitForServer(url, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    const check = () => {
+      http.get(url, () => resolve()).on("error", (err) => {
+        if (Date.now() - start > timeout) return reject(err);
+        setTimeout(check, 100);
+      });
+    };
+    check();
+  });
+}
+
+async function startServer() {
   try {
     const serverPath = path.join(__dirname, "../backend/src/server.js");
+    // Usa import dinamico per ESM
     await import(pathToFileURL(serverPath).href);
+    console.log("Server avviato");
+  } catch (err) {
+    console.error("Errore avviando il server:", err);
+  }
+}
+
+async function createWindow() {
+  await startServer();
+
+  try {
+    await waitForServer("http://localhost:3000");
 
     const win = new BrowserWindow({
       width: 1200,
@@ -18,7 +45,7 @@ async function createWindow() {
 
     win.loadURL("http://localhost:3000");
   } catch (err) {
-    console.error("Errore avviando il server:", err);
+    console.error("Server non raggiungibile:", err);
   }
 }
 
