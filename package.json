@@ -40,17 +40,11 @@
     },
 
     "files": [
+      "backend/**/*",
       "frontend/**/*",
       "electron/**/*",
       "package.json",
       "node_modules/**/*"
-    ],
-
-    "extraResources": [
-      {
-        "from": "backend",
-        "to": "backend"
-      }
     ],
 
     "mac": {
