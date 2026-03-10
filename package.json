@@ -22,36 +22,41 @@
     "better-sqlite3": "^9.4.0"
   },
   "build": {
-    "appId": "com.mapapp.desktop",
-    "productName": "MapApp",
-    "asar": true,
-    "npmRebuild": false,
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "backend/**/*",
-      "frontend/**/*",
-      "electron/**/*",
-      "package.json",
-      "node_modules/**/*"
-    ],
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ]
-    },
-    "win": {
-      "target": "nsis",
-      "artifactName": "MapAppSetup-${version}.exe"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+  "appId": "com.mapapp.desktop",
+  "productName": "MapApp",
+  "asar": true,
+  "npmRebuild": false,
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "frontend/**/*",
+    "electron/**/*",
+    "package.json",
+    "node_modules/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "backend",
+      "to": "backend"
     }
+  ],
+  "mac": {
+    "target": [
+      "dmg",
+      "zip"
+    ]
+  },
+  "win": {
+    "target": "nsis",
+    "artifactName": "MapAppSetup-${version}.exe"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
   }
+}
 }

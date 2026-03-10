@@ -1,24 +1,38 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const { fork } = require("child_process");
+const http = require("http");
 
 let serverProcess;
 
 function startServer() {
-  try {
-    // usa un path diverso se sei in dev o in build
+  return new Promise((resolve, reject) => {
+
     const serverPath = app.isPackaged
-      ? path.join(process.resourcesPath, "backend/src/server.js") // build
-      : path.join(__dirname, "../backend/src/server.js");       // dev
+      ? path.join(process.resourcesPath, "backend/src/server.js")
+      : path.join(__dirname, "../backend/src/server.js");
 
     serverProcess = fork(serverPath, { stdio: "inherit" });
 
-    serverProcess.on("exit", (code, signal) => {
-      console.log(`Server terminato con codice ${code}, signal ${signal}`);
-    });
-  } catch (err) {
-    console.error("Errore avviando il server:", err);
-  }
+    serverProcess.on("error", reject);
+
+    waitForServer(resolve);
+  });
+}
+
+function waitForServer(resolve) {
+  const tryConnect = () => {
+    http
+      .get("http://localhost:3000", () => {
+        console.log("Server pronto");
+        resolve();
+      })
+      .on("error", () => {
+        setTimeout(tryConnect, 300);
+      });
+  };
+
+  tryConnect();
 }
 
 function createWindow() {
@@ -34,8 +48,8 @@ function createWindow() {
   win.loadURL("http://localhost:3000");
 }
 
-app.whenReady().then(() => {
-  startServer();
+app.whenReady().then(async () => {
+  await startServer();
   createWindow();
 });
 
