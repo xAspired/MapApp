@@ -9,8 +9,9 @@
   "scripts": {
     "start": "electron .",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "postinstall": "electron-builder install-app-deps",
     "build": "electron-builder --mac --win --publish never",
-    "dist": "electron-builder --win --x64 --ia32 --publish never"
+    "dist": "electron-builder --win --x64 --publish never"
   },
   "devDependencies": {
     "electron": "^25.3.1",
@@ -24,6 +25,7 @@
   "build": {
     "appId": "com.mapapp.desktop",
     "productName": "MapApp",
+    "asar": true,
     "directories": {
       "output": "dist"
     },
