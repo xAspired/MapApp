@@ -1,57 +1,46 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
-const { pathToFileURL } = require("url");
-const http = require("http");
+const { fork } = require("child_process");
 
-// Funzione per verificare se il server è pronto
-function waitForServer(url, timeout = 5000) {
-  return new Promise((resolve, reject) => {
-    const start = Date.now();
-    const check = () => {
-      http.get(url, () => resolve()).on("error", (err) => {
-        if (Date.now() - start > timeout) return reject(err);
-        setTimeout(check, 100);
-      });
-    };
-    check();
-  });
-}
+let serverProcess;
 
-async function startServer() {
+function startServer() {
   try {
-    const serverPath = path.join(__dirname, "../backend/src/server.js");
-    // Usa import dinamico per ESM
-    await import(pathToFileURL(serverPath).href);
-    console.log("Server avviato");
+    // usa un path diverso se sei in dev o in build
+    const serverPath = app.isPackaged
+      ? path.join(process.resourcesPath, "backend/src/server.js") // build
+      : path.join(__dirname, "../backend/src/server.js");       // dev
+
+    serverProcess = fork(serverPath, { stdio: "inherit" });
+
+    serverProcess.on("exit", (code, signal) => {
+      console.log(`Server terminato con codice ${code}, signal ${signal}`);
+    });
   } catch (err) {
     console.error("Errore avviando il server:", err);
   }
 }
 
-async function createWindow() {
-  await startServer();
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
 
-  try {
-    await waitForServer("http://localhost:3000");
-
-    const win = new BrowserWindow({
-      width: 1200,
-      height: 800,
-      webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-      },
-    });
-
-    win.loadURL("http://localhost:3000");
-  } catch (err) {
-    console.error("Server non raggiungibile:", err);
-  }
+  win.loadURL("http://localhost:3000");
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  startServer();
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
+  if (serverProcess) serverProcess.kill();
   if (process.platform !== "darwin") app.quit();
 });
 
