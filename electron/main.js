@@ -9,7 +9,7 @@ function startServer() {
   return new Promise((resolve, reject) => {
 
     const serverPath = app.isPackaged
-      ? path.join(process.resourcesPath, "backend/src/server.js")
+      ? path.join(app.getAppPath(), "backend", "src", "server.js")
       : path.join(__dirname, "../backend/src/server.js");
 
     serverProcess = fork(serverPath, { stdio: "inherit" });
