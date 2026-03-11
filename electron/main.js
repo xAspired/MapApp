@@ -2,17 +2,22 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const { fork } = require("child_process");
 const http = require("http");
+const { pathToFileURL } = require("url");
 
 let serverProcess;
 
 function startServer() {
+  // Path differente per dev / build
   const serverPath = app.isPackaged
-    ? path.join(app.getAppPath(), "backend", "src", "server.js")
+    ? path.join(process.resourcesPath, "backend", "src", "server.js")
     : path.join(__dirname, "..", "backend", "src", "server.js");
 
-  console.log("Avvio server:", serverPath);
+  // Trasforma in file:// URL per compatibilità Windows
+  const serverURL = pathToFileURL(serverPath).href;
 
-  serverProcess = fork(serverPath, { stdio: "inherit" });
+  console.log("Avvio server:", serverURL);
+
+  serverProcess = fork(serverURL, { stdio: "inherit" });
 
   serverProcess.on("exit", (code, signal) => {
     console.log(`Server terminato con codice ${code}, signal ${signal}`);
@@ -38,7 +43,6 @@ function waitForServer(retries = 50) {
           }
         });
     };
-
     check();
   });
 }
@@ -54,14 +58,11 @@ function createWindow() {
   });
 
   win.loadURL("http://localhost:3000");
-
-  // utile per debug
-  win.webContents.openDevTools();
+  win.webContents.openDevTools(); // utile per debug
 }
 
 app.whenReady().then(async () => {
   startServer();
-
   try {
     await waitForServer();
     createWindow();
