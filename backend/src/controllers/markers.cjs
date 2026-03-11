@@ -1,27 +1,20 @@
-import db from '../db.js';
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+const db = require('../db.cjs');
+const booleanPointInPolygon = require('@turf/boolean-point-in-polygon');
 
-// ===============================
 // trova il country di un punto
-// ===============================
 function findCountryId(lon, lat) {
   const countries = db.prepare(`SELECT gid, geom FROM countries`).all();
-
   const point = { type: "Point", coordinates: [lon, lat] };
 
   for (const c of countries) {
     const polygon = JSON.parse(c.geom);
-    if (booleanPointInPolygon(point, polygon)) {
-      return c.gid;
-    }
+    if (booleanPointInPolygon(point, polygon)) return c.gid;
   }
   return null;
 }
 
-// ===============================
 // GET tutti i marker
-// ===============================
-export function getMarkers(req, res) {
+function getMarkers(req, res) {
   try {
     const rows = db.prepare(`
       SELECT id, name, description, lon, lat, rating, folder_id
@@ -47,23 +40,18 @@ export function getMarkers(req, res) {
     };
 
     res.json(geojson);
-
   } catch (err) {
     console.error('ERRORE GET MARKERS:', err);
     res.status(500).json({ error: err.message });
   }
 }
 
-// ===============================
-// POST aggiungi marker
-// ===============================
-export function addMarker(req, res) {
+// POST nuovo marker
+function addMarker(req, res) {
   const { name, description, lon, lat, folderId } = req.body;
 
   try {
     const country_id = findCountryId(lon, lat);
-
-    // verifica folderId nel DB
     let folder_id = null;
     if (folderId !== null && folderId !== undefined) {
       const folderExists = db.prepare('SELECT id FROM folders WHERE id = ?').get(Number(folderId));
@@ -83,52 +71,35 @@ export function addMarker(req, res) {
       folderId: folder_id,
       rating: 0
     });
-
   } catch (err) {
     console.error('ERRORE POST MARKER:', err);
     res.status(500).json({ error: err.message });
   }
 }
 
-// ===============================
-// PATCH aggiorna rating
-// ===============================
-export function updateMarkerRating(req, res) {
+// PATCH rating
+function updateMarkerRating(req, res) {
   const markerId = req.params.id;
   const { rating } = req.body;
 
-  if (rating === undefined || rating < 0 || rating > 5) {
+  if (rating === undefined || rating < 0 || rating > 5)
     return res.status(400).json({ error: "Rating non valido (0-5)" });
-  }
 
   try {
-    const result = db.prepare(`
-      UPDATE markers
-      SET rating = ?
-      WHERE id = ?
-    `).run(rating, markerId);
-
+    const result = db.prepare(`UPDATE markers SET rating = ? WHERE id = ?`).run(rating, markerId);
     if (result.changes === 0) return res.status(404).json({ error: "Marker non trovato" });
 
-    const marker = db.prepare(`
-      SELECT id, name, description, rating
-      FROM markers
-      WHERE id = ?
-    `).get(markerId);
-
-    marker.folderId = null; // cartella sempre frontend
+    const marker = db.prepare(`SELECT id, name, description, rating FROM markers WHERE id = ?`).get(markerId);
+    marker.folderId = null;
     res.json(marker);
-
   } catch (err) {
     console.error('ERRORE PATCH RATING:', err);
     res.status(500).json({ error: err.message });
   }
 }
 
-// ===============================
 // DELETE marker
-// ===============================
-export function deleteMarker(req, res) {
+function deleteMarker(req, res) {
   const markerId = req.params.id;
 
   try {
@@ -136,32 +107,20 @@ export function deleteMarker(req, res) {
     if (result.changes === 0) return res.status(404).json({ error: "Marker non trovato" });
 
     res.json({ success: true });
-
   } catch (err) {
     console.error('ERRORE DELETE MARKER:', err);
     res.status(500).json({ error: err.message });
   }
 }
 
-// ===============================
-// PATCH aggiorna folder di un marker
-// ===============================
-export function updateMarkerFolder(req, res) {
+// PATCH folder marker
+function updateMarkerFolder(req, res) {
   const markerId = req.params.id;
   let { folderId } = req.body;
-  console.log("🛠 Backend riceve PATCH folder:", { markerId, folderId });
-
   if (folderId !== null && folderId !== undefined) folderId = Number(folderId);
 
   try {
-    const result = db.prepare(`
-      UPDATE markers
-      SET folder_id = ?
-      WHERE id = ?
-    `).run(folderId || null, markerId);
-
-    console.log("🛠 Backend UPDATE result:", result);
-
+    const result = db.prepare(`UPDATE markers SET folder_id = ? WHERE id = ?`).run(folderId || null, markerId);
     if (result.changes === 0) return res.status(404).json({ error: "Marker non trovato" });
 
     const marker = db.prepare(`
@@ -170,11 +129,11 @@ export function updateMarkerFolder(req, res) {
       WHERE id = ?
     `).get(markerId);
 
-    console.log("🛠 Backend marker aggiornato:", marker);
     res.json(marker);
-
   } catch (err) {
     console.error('ERRORE PATCH folder marker:', err);
     res.status(500).json({ error: err.message });
   }
 }
+
+module.exports = { getMarkers, addMarker, deleteMarker, updateMarkerRating, updateMarkerFolder };

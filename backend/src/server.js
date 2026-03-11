@@ -3,9 +3,9 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import markersRoutes from './routes/markers.js';
-import countriesRoutes from './routes/countries.js';
-import foldersRoutes from './routes/folders.js';
+import markersRoutes from './routes/markers.cjs';
+import countriesRoutes from './routes/countries.cjs';
+import foldersRoutes from './routes/folders.cjs';
 
 const app = express();
 

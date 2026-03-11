@@ -1,5 +1,12 @@
-import express from 'express';
-import { getMarkers, addMarker, deleteMarker, updateMarkerRating, updateMarkerFolder } from '../controllers/markers.js';
+const express = require('express');
+const {
+  getMarkers,
+  addMarker,
+  deleteMarker,
+  updateMarkerRating,
+  updateMarkerFolder
+} = require('../controllers/markers.cjs');
+
 const router = express.Router();
 
 // GET tutti i marker
@@ -20,7 +27,6 @@ router.post('/', async (req, res) => {
   await addMarker(req, res);
 });
 
-
 // PATCH aggiorna rating marker
 router.patch('/:id/rating', async (req, res) => {
   console.log(`PATCH /api/markers/${req.params.id}/rating RICEVUTA`, req.body);
@@ -33,4 +39,4 @@ router.delete('/:id', async (req, res) => {
   await deleteMarker(req, res);
 });
 
-export default router;
+module.exports = router;

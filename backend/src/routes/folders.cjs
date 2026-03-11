@@ -1,6 +1,12 @@
-// routes/folders.js
-import express from 'express';
-import { getFolders, createFolder, deleteFolder, moveMarkerToFolder, updateFolder } from '../controllers/folders.js';
+const express = require('express');
+const {
+  getFolders,
+  createFolder,
+  deleteFolder,
+  moveMarkerToFolder,
+  updateFolder
+} = require('../controllers/folders.cjs');
+
 const router = express.Router();
 
 router.get('/', getFolders);
@@ -9,4 +15,4 @@ router.patch('/:id', updateFolder);
 router.delete('/:id', deleteFolder);
 router.patch('/marker/:markerId', moveMarkerToFolder);
 
-export default router;
+module.exports = router;

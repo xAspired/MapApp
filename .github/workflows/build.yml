@@ -5,7 +5,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-windows:
+    name: Build Windows
     runs-on: windows-latest
 
     steps:
@@ -15,12 +16,37 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm install
+      - run: npm ci
+
+      - run: npm run rebuild
 
       - run: npm run dist
 
-      - name: Upload Build Artifacts
+      - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MapApp-Windows
           path: dist/MapAppSetup-*.exe
+
+  build-mac:
+    name: Build Mac
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - run: npm run rebuild
+
+      - run: npm run dist
+
+      - name: Upload Mac Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MapApp-Mac
+          path: dist/*.dmg

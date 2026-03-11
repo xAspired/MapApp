@@ -1,28 +1,22 @@
-import db from '../db.js';
+const db = require('../db.cjs');
 
-export function getCountries(req, res) {
+function getCountries(req, res) {
   try {
-
     const { withMarkers } = req.query;
-
     let rows;
 
     if (withMarkers === 'true') {
-
       rows = db.prepare(`
         SELECT DISTINCT c.gid, c.name, c.geom
         FROM countries c
         JOIN markers m
         ON m.country_id = c.gid
       `).all();
-
     } else {
-
       rows = db.prepare(`
         SELECT gid, name, geom
         FROM countries
       `).all();
-
     }
 
     const geojson = {
@@ -44,3 +38,5 @@ export function getCountries(req, res) {
     res.status(500).json({ error: err.message });
   }
 }
+
+module.exports = { getCountries };

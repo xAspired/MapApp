@@ -1,18 +1,16 @@
-import Database from "better-sqlite3";
-import path from "path";
-import { fileURLToPath } from "url";
-import fs from "fs";
+const Database = require("better-sqlite3");
+const path = require("path");
+const fs = require("fs");
+const { app } = require("electron");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const dbPath = path.join(__dirname, "../../mapapp.sqlite");
+// Percorso sicuro e persistente del DB
+const dbPath = path.join(app.getPath("userData"), "mapapp.sqlite");
 const dbExists = fs.existsSync(dbPath);
 
 const db = new Database(dbPath);
 
-// ATTIVA FOREIGN KEY
-db.pragma('foreign_keys = ON');
+// Attiva foreign key
+db.pragma("foreign_keys = ON");
 
 // ===============================
 // TABELLE
@@ -59,12 +57,10 @@ CREATE TABLE IF NOT EXISTS markers (
 // DATI DI ESEMPIO
 // ===============================
 if (!dbExists) {
-  // una cartella di esempio
   const folderId = db.prepare(`
     INSERT INTO folders (name, color) VALUES (?, ?)
   `).run("Luoghi preferiti", "#ff0000").lastInsertRowid;
 
-  // un paese di esempio
   db.prepare(`
     INSERT INTO countries (gid, name, geom, lon_min, lon_max, lat_min, lat_max)
     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -75,13 +71,12 @@ if (!dbExists) {
     6.6, 18.5, 36.6, 47.1
   );
 
-  // un marker di esempio
   db.prepare(`
     INSERT INTO markers (name, description, lon, lat, country_id, folder_id, rating)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `).run("Punto di esempio", "Marker di prova", 12.5, 42.0, 1, folderId, 3);
 
-  console.log("Database vuoto: dati di esempio inseriti ✅");
+  console.log("Database creato in:", dbPath);
 }
 
-export default db;
+module.exports = db;
