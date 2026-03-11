@@ -6,33 +6,41 @@ const http = require("http");
 let serverProcess;
 
 function startServer() {
-  return new Promise((resolve, reject) => {
+  const serverPath = app.isPackaged
+    ? path.join(app.getAppPath(), "backend", "src", "server.js")
+    : path.join(__dirname, "..", "backend", "src", "server.js");
 
-    const serverPath = app.isPackaged
-      ? path.join(app.getAppPath(), "backend", "src", "server.js")
-      : path.join(__dirname, "../backend/src/server.js");
+  console.log("Avvio server:", serverPath);
 
-    serverProcess = fork(serverPath, { stdio: "inherit" });
+  serverProcess = fork(serverPath, { stdio: "inherit" });
 
-    serverProcess.on("error", reject);
-
-    waitForServer(resolve);
+  serverProcess.on("exit", (code, signal) => {
+    console.log(`Server terminato con codice ${code}, signal ${signal}`);
   });
 }
 
-function waitForServer(resolve) {
-  const tryConnect = () => {
-    http
-      .get("http://localhost:3000", () => {
-        console.log("Server pronto");
-        resolve();
-      })
-      .on("error", () => {
-        setTimeout(tryConnect, 300);
-      });
-  };
+function waitForServer(retries = 50) {
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      http
+        .get("http://localhost:3000", () => {
+          console.log("Server pronto");
+          resolve();
+        })
+        .on("error", () => {
+          if (retries <= 0) {
+            reject("Server non raggiungibile");
+          } else {
+            setTimeout(() => {
+              retries--;
+              check();
+            }, 200);
+          }
+        });
+    };
 
-  tryConnect();
+    check();
+  });
 }
 
 function createWindow() {
@@ -46,11 +54,20 @@ function createWindow() {
   });
 
   win.loadURL("http://localhost:3000");
+
+  // utile per debug
+  win.webContents.openDevTools();
 }
 
 app.whenReady().then(async () => {
-  await startServer();
-  createWindow();
+  startServer();
+
+  try {
+    await waitForServer();
+    createWindow();
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 app.on("window-all-closed", () => {
