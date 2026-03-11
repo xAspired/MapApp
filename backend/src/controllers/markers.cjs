@@ -1,5 +1,5 @@
 const db = require('../db.cjs');
-const booleanPointInPolygon = require('@turf/boolean-point-in-polygon');
+const booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default;
 
 // trova il country di un punto
 function findCountryId(lon, lat) {
