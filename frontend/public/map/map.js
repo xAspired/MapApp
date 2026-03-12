@@ -276,6 +276,11 @@ function enableAddMarker() {
     tempMarkerCoords = e.latlng;
     const modal = document.getElementById('marker-modal');
     modal.classList.add('show');
+
+    setTimeout(() => {
+      document.getElementById('marker-name-input')?.focus();
+    }, 50);
+
     const saveBtn = document.getElementById('marker-save-btn');
     const cancelBtn = document.getElementById('marker-cancel-btn');
     const folderSelect = document.getElementById('marker-folder-select');
@@ -377,3 +382,139 @@ export async function loadFoldersFromBackend() {
     console.error("Errore caricando cartelle:", err);
   }
 }
+
+// ===============================
+// RICERCA LUOGHI (PHOTON)
+// ===============================
+const searchInput = document.getElementById("search-input");
+const searchResults = document.getElementById("search-results");
+
+let searchTimeout;
+
+searchInput.addEventListener("input", () => {
+
+  clearTimeout(searchTimeout);
+
+  const query = searchInput.value.trim();
+
+  if (query.length < 3) {
+    searchResults.innerHTML = "";
+    return;
+  }
+
+  searchTimeout = setTimeout(async () => {
+
+    console.log("Searching:", query);
+
+    try {
+
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+
+      console.log("Photon results:", data);
+
+      const results = data.features || [];
+
+      searchResults.innerHTML = results.map(place => {
+
+      const lat = place.geometry.coordinates[1];
+      const lon = place.geometry.coordinates[0];
+
+      const street = place.properties.street || "";
+      const housenumber = place.properties.housenumber || "";
+      const city = place.properties.city || "";
+      const country = place.properties.country || "";
+      const name = place.properties.name || "Luogo";
+
+      return `
+        <div class="search-item"
+          data-lat="${lat}"
+          data-lon="${lon}">
+          <strong>${name}</strong><br>
+          ${street} ${housenumber} ${city} <small>${country}</small>
+        </div>
+      `;
+    }).join("");
+
+    // MOSTRA risultati
+    searchResults.style.display = "block";
+
+    } catch(err) {
+      console.error("Search error:", err);
+    }
+
+  }, 300); // debounce
+
+});
+
+let tempSearchMarker = null;
+
+searchResults.addEventListener("click", (e) => {
+  const item = e.target.closest(".search-item");
+  if (!item) return;
+
+  const lat = parseFloat(item.dataset.lat);
+  const lon = parseFloat(item.dataset.lon);
+
+  // Zoom sulla posizione
+  map.setView([lat, lon], 17);
+
+  // Rimuovi eventuale marker temporaneo precedente
+  if (tempSearchMarker) map.removeLayer(tempSearchMarker);
+
+  // Marker temporaneo standard (non stile markersLayer)
+  tempSearchMarker = L.marker([lat, lon]).addTo(map).bindPopup("📍 Posizione selezionata").openPopup();
+
+  // Prepara e mostra modal esistente
+  const modal = document.getElementById("marker-modal");
+  const nameInput = document.getElementById("marker-name-input");
+  const descInput = document.getElementById("marker-desc-input");
+  const folderSelect = document.getElementById("marker-folder-select");
+  const saveBtn = document.getElementById("marker-save-btn");
+  const cancelBtn = document.getElementById("marker-cancel-btn");
+
+  modal.classList.add("show");
+
+  nameInput.value = item.querySelector("strong").textContent || "";
+  descInput.value = "";
+  folderSelect.innerHTML = `<option value="">Nessuna cartella</option>` + folders.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+
+  // Rimuove vecchi listener e aggiunge nuovi
+  saveBtn.replaceWith(saveBtn.cloneNode(true));
+  cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+  const newSaveBtn = document.getElementById("marker-save-btn");
+  const newCancelBtn = document.getElementById("marker-cancel-btn");
+
+  newSaveBtn.addEventListener("click", async () => {
+    const name = nameInput.value.trim();
+    if (!name) return alert("Inserisci un nome per il marker!");
+    const desc = descInput.value.trim();
+    const folderId = folderSelect.value || null;
+
+    try {
+      // Rimuovi temporaneo prima di salvare marker definitivo
+      if (tempSearchMarker) map.removeLayer(tempSearchMarker);
+      tempSearchMarker = null;
+
+      await addMarkerToBackend(name, desc, lon, lat, folderId);
+      await loadMarkers(map, folders); // marker definitivo con stile
+      modal.classList.remove("show");
+    } catch(err) {
+      console.error(err);
+      alert("Errore durante il salvataggio del marker");
+    }
+  });
+
+  newCancelBtn.addEventListener("click", () => {
+    modal.classList.remove("show");
+    if (tempSearchMarker) {
+      map.removeLayer(tempSearchMarker);
+      tempSearchMarker = null;
+    }
+  });
+
+  // Nascondi risultati ricerca
+  searchResults.innerHTML = "";
+  searchResults.style.display = "none";
+  searchInput.value = "";
+});

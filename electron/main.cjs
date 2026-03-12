@@ -21,6 +21,27 @@ async function startServer() {
   server.use("/api/countries", countriesRoutes);
   server.use("/api/markers", markersRoutes);
 
+  server.get('/api/search', async (req, res) => {
+  try {
+    const query = req.query.q;
+    if (!query) return res.json([]);
+
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=8`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'RichiMap/1.0 (youremail@example.com)',
+        'Accept': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).json({ error: "Search failed" });
+  }
+});
+
   // Frontend static
   const frontendPath = path.join(__dirname, "../frontend/public");
   server.use(express.static(frontendPath));
