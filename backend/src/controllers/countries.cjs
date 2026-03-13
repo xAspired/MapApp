@@ -1,35 +1,27 @@
-const db = require('../db.cjs');
+const fs = require("fs");
+const path = require("path");
+const db = require("../db.cjs");
 
 function getCountries(req, res) {
   try {
+
+    const file = path.join(__dirname, "../../data/countries.geo.json");
+    const geojson = JSON.parse(fs.readFileSync(file, "utf8"));
+
     const { withMarkers } = req.query;
-    let rows;
 
-    if (withMarkers === 'true') {
-      rows = db.prepare(`
-        SELECT DISTINCT c.gid, c.name, c.geom
-        FROM countries c
-        JOIN markers m
-        ON m.country_id = c.gid
-      `).all();
-    } else {
-      rows = db.prepare(`
-        SELECT gid, name, geom
-        FROM countries
-      `).all();
+    if (withMarkers === "true") {
+
+      const countriesWithMarkers = db.prepare(`
+        SELECT DISTINCT country_id
+        FROM markers
+      `).all().map(r => r.country_id);
+
+      geojson.features = geojson.features.filter(f =>
+        countriesWithMarkers.includes(f.id)
+      );
+
     }
-
-    const geojson = {
-      type: "FeatureCollection",
-      features: rows.map(r => ({
-        type: "Feature",
-        properties: {
-          gid: r.gid,
-          name: r.name
-        },
-        geometry: JSON.parse(r.geom)
-      }))
-    };
 
     res.json(geojson);
 
