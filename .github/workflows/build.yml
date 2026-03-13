@@ -5,6 +5,9 @@ on:
     branches: [ main ]
 
 jobs:
+  # ======================================================
+  # Build Windows
+  # ======================================================
   build-windows:
     name: Build Windows
     runs-on: windows-latest
@@ -18,16 +21,22 @@ jobs:
 
       - run: npm install
 
+      # Rebuild native modules
       - run: npx electron-rebuild -f -w better-sqlite3
 
-      - run: npm run dist
+      # Dist con icona .ico (specificata in package.json / build config)
+      - run: npm run dist -- --win
 
+      # Upload artifact
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MapApp-Windows
           path: dist/MapAppSetup-*.exe
 
+  # ======================================================
+  # Build Mac
+  # ======================================================
   build-mac:
     name: Build Mac
     runs-on: macos-latest
@@ -43,8 +52,10 @@ jobs:
 
       - run: npx electron-rebuild -f -w better-sqlite3
 
-      - run: npm run dist
+      # Dist con icona .icns
+      - run: npm run dist -- --mac
 
+      # Upload artifact DMG specifico Mac
       - name: Upload Mac Artifact
         uses: actions/upload-artifact@v4
         with:

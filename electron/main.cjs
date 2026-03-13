@@ -22,25 +22,25 @@ async function startServer() {
   server.use("/api/markers", markersRoutes);
 
   server.get('/api/search', async (req, res) => {
-  try {
-    const query = req.query.q;
-    if (!query) return res.json([]);
+    try {
+      const query = req.query.q;
+      if (!query) return res.json([]);
 
-    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=8`;
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'RichiMap/1.0 (youremail@example.com)',
-        'Accept': 'application/json'
-      }
-    });
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=8`;
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'RichiMap/1.0 (youremail@example.com)',
+          'Accept': 'application/json'
+        }
+      });
 
-    const data = await response.json();
-    res.json(data);
-  } catch (err) {
-    console.error("Search error:", err);
-    res.status(500).json({ error: "Search failed" });
-  }
-});
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      console.error("Search error:", err);
+      res.status(500).json({ error: "Search failed" });
+    }
+  });
 
   // Frontend static
   const frontendPath = path.join(__dirname, "../frontend/public");
@@ -62,6 +62,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
+    icon: path.join(__dirname, "../frontend/public/img/icons/icon.png"),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -69,12 +70,16 @@ function createWindow() {
   });
 
   win.loadURL("http://localhost:3000");
-  win.webContents.openDevTools(); // utile per debug
 }
 
 // --- CICLO VITA APP ---
 app.whenReady().then(() => {
   startServer();
+  
+  if (process.platform === "darwin") {
+    app.dock.setIcon(path.join(__dirname, "../frontend/public/img/icons/icon.png"));
+  }
+
   createWindow();
 });
 

@@ -26,32 +26,35 @@
     "jquery": "^4.0.0"
   },
   "build": {
-    "appId": "com.mapapp.desktop",
-    "productName": "MapApp",
-    "asar": true,
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "frontend/**/*",
-      "electron/**/*",
-      "backend/**/*",
-      "package.json",
-      "node_modules/**/*"
-    ],
-    "mac": {
-      "target": ["dmg", "zip"]
-    },
-    "win": {
-      "target": "nsis",
-      "artifactName": "MapAppSetup-${version}.exe"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
-    }
+  "appId": "com.mapapp.desktop",
+  "productName": "MapApp",
+  "asar": true,
+  "directories": {
+    "output": "dist",
+    "buildResources": "frontend/public/img/icons"
+  },
+  "files": [
+    "frontend/**/*",
+    "electron/**/*",
+    "backend/**/*",
+    "package.json",
+    "node_modules/**/*"
+  ],
+  "mac": {
+    "icon": "icon.icns",
+    "target": ["dmg", "zip"]
+  },
+  "win": {
+    "icon": "icon.ico",
+    "target": "nsis",
+    "artifactName": "MapAppSetup-${version}.exe"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
   }
+}
 }
